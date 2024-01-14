@@ -102,6 +102,55 @@ public class Backend implements BackendInterface<String, Double> {
 		return new ShortestPath(shortestPath, walkingTimes, totalTime);
 	}
 
+/**
+
+	 * This method will find a path that must include the midpoint. Instead of going
+	 * from A->B it will go from A->C->B Will return the Path from A->C and then
+	 * C->B.
+	 * 
+	 * @param start    - the start node
+	 * @param midpoint - the node that the path must go through
+	 * @param end      - the destination
+	 * @return - a List of nodes that include the start midpoint and end nodes
+	 * @throws NoSuchElementException
+	 */
+	@Override
+	public ShortestPathInterface<String, Double> findShortestPathWithMidpoint(String start,
+
+			String midpoint, String destination) throws NoSuchElementException {
+		// checks if valid start and destination buildings are given
+		if (!graph.containsNode(start) || !graph.containsNode(midpoint) || !graph.containsNode(destination)) {
+			throw new NoSuchElementException("The start, midpoint, or destination building could not be found!");
+		}
+
+		// find the shortest path w/ midpoint as a destiantion and start
+
+		List<String> firstPart = graph.shortestPathData(start, midpoint);
+		List<String> secondPart = graph.shortestPathData(midpoint, destination);
+
+		secondPart.remove(0);
+
+		//combine separate paths
+
+		List<String> totalPath = new ArrayList<String>();
+		totalPath.addAll(firstPart);
+		totalPath.addAll(secondPart);
+
+		double totalTime = graph.shortestPathCost(start, midpoint) + graph.shortestPathCost(midpoint, destination);
+
+		// find walking times between each building visited
+		List<Double> firstWalkingTimes = walkingTimesHelper(firstPart);
+		List<Double> secondWalkingTimes = walkingTimesHelper(secondPart);
+
+		secondWalkingTimes.remove(0);
+
+		List<Double> totalWalkingTimes = new ArrayList<Double>();
+		totalWalkingTimes.addAll(firstWalkingTimes);
+		totalWalkingTimes.addAll(secondWalkingTimes);
+
+		return new ShortestPath(totalPath, totalWalkingTimes, totalTime);
+	}
+
 	/**
 	 * Helper method for the findShortestPath. Used to find the walking times
 	 * between each building in the shortest path.
@@ -153,27 +202,6 @@ public class Backend implements BackendInterface<String, Double> {
 				+ totalTimeGraph + "\n";
 
 		return stats;
-	}
-
-	/**
-	 * This method will find a path that must include the midpoint. Instead of going
-	 * from A->B it will go from A->C->B Will return the Path from A->C and then
-	 * C->B.
-	 * 
-	 * @param start    - the start node
-	 * @param midpoint - the node that the path must go through
-	 * @param end      - the destination
-	 * @return - a List of nodes that include the start midpoint and end nodes
-	 * @throws NoSuchElementException
-	 */
-	public List<String> shortestPathMidpoint(String start, String midpoint, String end) throws NoSuchElementException {
-		List<String> first = graph.shortestPathData(start, midpoint);
-		List<String> second = graph.shortestPathData(midpoint, end);
-		second.remove(0);
-		List<String> total = new ArrayList<String>();
-		total.addAll(first);
-		total.addAll(second);
-		return total;
 	}
 
 }
