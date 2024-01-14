@@ -3,7 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.util.Scanner; 
 
 /**
  * Loads in the file given by user, finds the shortest path between to
